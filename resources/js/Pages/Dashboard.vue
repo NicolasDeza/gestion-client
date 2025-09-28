@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import DashboardStats from "@/Components/StatsCards.vue"; //
+import StatsCards from "@/Components/StatsCards.vue";
 </script>
 
 <template>
@@ -13,6 +13,7 @@ import DashboardStats from "@/Components/StatsCards.vue"; //
             </h2>
         </template>
 
-        <DashboardStats />
+        <!-- Appel unique -->
+        <StatsCards />
     </AppLayout>
 </template>

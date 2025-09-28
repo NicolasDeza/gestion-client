@@ -1,20 +1,25 @@
 <script setup>
+import { ref } from "vue";
+import { getLocalTimeZone, today } from "@internationalized/date";
+import TeamMembers from "@/Components/ui/TeamMembers.vue";
+
 defineProps({
     clientsCount: {
         type: Number,
-        required: false,
-        default: 24, // valeur fictive
+        default: 16, // valeur fictive
     },
     machinesCount: {
         type: Number,
-        required: false,
-        default: 58, // valeur fictive
+        default: 21, // valeur fictive
     },
 });
+
+// Valeur sélectionnée du calendrier
+const value = ref(today(getLocalTimeZone()));
 </script>
 
 <template>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Card Clients -->
         <div
             class="bg-white dark:bg-dark-chat-900 p-6 rounded-xl shadow hover:shadow-lg transition"
@@ -42,5 +47,8 @@ defineProps({
                 {{ machinesCount }}
             </p>
         </div>
+
+        <!-- Team Members - même style que les autres -->
+        <TeamMembers />
     </div>
 </template>
