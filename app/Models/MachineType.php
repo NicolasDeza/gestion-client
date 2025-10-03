@@ -9,4 +9,8 @@ class MachineType extends Model
 {
     /** @use HasFactory<\Database\Factories\MachineTypeFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'nom',
+    ];
 }

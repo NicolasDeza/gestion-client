@@ -1,21 +1,16 @@
 <script setup>
-import { ref } from "vue";
-import { getLocalTimeZone, today } from "@internationalized/date";
 import TeamMembers from "@/Components/ui/TeamMembers.vue";
 
-defineProps({
+const props = defineProps({
     clientsCount: {
         type: Number,
-        default: 16, // valeur fictive
+        required: true,
     },
     machinesCount: {
         type: Number,
-        default: 21, // valeur fictive
+        required: true,
     },
 });
-
-// Valeur sélectionnée du calendrier
-const value = ref(today(getLocalTimeZone()));
 </script>
 
 <template>
@@ -48,7 +43,7 @@ const value = ref(today(getLocalTimeZone()));
             </p>
         </div>
 
-        <!-- Team Members - même style que les autres -->
+        <!-- Team Members -->
         <TeamMembers />
     </div>
 </template>

@@ -23,14 +23,20 @@ class Machine extends Model
         return $this->belongsTo(Client::class);
     }
 
-    public function type()
+    public function marque()
+    {
+        return $this->belongsTo(Marque::class);
+    }
+
+    public function machineType()
     {
         return $this->belongsTo(MachineType::class, 'machine_type_id');
     }
 
-    public function marque()
+    // Alias pour la compatibilité
+    public function type()
     {
-        return $this->belongsTo(Marque::class);
+        return $this->machineType();
     }
 
     public function interventions()

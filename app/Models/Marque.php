@@ -9,4 +9,8 @@ class Marque extends Model
 {
     /** @use HasFactory<\Database\Factories\MarqueFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'nom',
+    ];
 }

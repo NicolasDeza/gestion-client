@@ -24,7 +24,7 @@ class Intervention extends Model
         return $this->belongsTo(Machine::class);
     }
 
-    public function pieceChangees() {
+    public function piecesChangees() {
         return $this->hasMany(PieceChangee::class, 'intervention_id');
     }
 }

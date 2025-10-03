@@ -3,7 +3,7 @@ import { Head } from "@inertiajs/vue3";
 import Sidebar from "@/Components/Sidebar.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
-import DarkModeToggle from "@/Components/DarkModeToggle.vue"; // ✅ nouveau
+import DarkModeToggle from "@/Components/DarkModeToggle.vue";
 import { router } from "@inertiajs/vue3";
 
 defineProps({

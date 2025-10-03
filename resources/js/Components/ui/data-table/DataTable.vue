@@ -48,7 +48,27 @@ const getCellValue = (row, column) => {
                         :key="column.accessorKey"
                         class="px-4 py-3 text-sm text-gray-800 dark:text-dark-chat-200"
                     >
-                        {{ getCellValue(row, column) }}
+                        <!-- Slot pour les colonnes personnalisées -->
+                        <template v-if="column.accessorKey === 'actions'">
+                            <slot name="actions" :row="row">
+                                {{ getCellValue(row, column) }}
+                            </slot>
+                        </template>
+
+                        <template
+                            v-else-if="
+                                column.accessorKey === 'statut_intervention'
+                            "
+                        >
+                            <slot name="statut_intervention" :row="row">
+                                {{ getCellValue(row, column) }}
+                            </slot>
+                        </template>
+
+                        <!-- Valeur normale pour les autres colonnes -->
+                        <template v-else>
+                            {{ getCellValue(row, column) }}
+                        </template>
                     </td>
                 </tr>
 
