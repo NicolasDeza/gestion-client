@@ -3,11 +3,11 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import DataTable from "@/Components/ui/data-table/DataTable.vue";
 import AddInterventionModal from "@/Components/AddInterventionModal.vue";
 import Toast from "@/Components/Toast.vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
-    clients: Array,
+    clients: Object, // ← Changer Array en Object pour pagination
 });
 
 const columns = [
@@ -44,6 +44,19 @@ const onInterventionCreated = () => {
         },
     });
 };
+
+// Transformer les données - gérer pagination ou array simple
+const clientsData = computed(() => {
+    const clientsArray = props.clients.data || props.clients;
+    return clientsArray;
+});
+
+// Fonction pour traduire les labels de pagination
+const translatePaginationLabel = (label) => {
+    if (label.includes("Previous")) return "Précédent";
+    if (label.includes("Next")) return "Suivant";
+    return label;
+};
 </script>
 
 <template>
@@ -57,7 +70,7 @@ const onInterventionCreated = () => {
         </template>
 
         <div class="mt-6">
-            <DataTable :columns="columns" :data="clients">
+            <DataTable :columns="columns" :data="clientsData">
                 <template #actions="{ row }">
                     <div class="flex items-center gap-2">
                         <a
@@ -108,6 +121,37 @@ const onInterventionCreated = () => {
                     </div>
                 </template>
             </DataTable>
+
+            <!-- Pagination seulement si les données sont paginées -->
+            <div class="mt-4" v-if="props.clients.links">
+                <nav class="flex justify-center">
+                    <div class="flex space-x-1">
+                        <template
+                            v-for="link in props.clients.links"
+                            :key="link.label"
+                        >
+                            <a
+                                v-if="link.url"
+                                :href="link.url"
+                                :class="[
+                                    'px-3 py-2 text-sm rounded-md transition',
+                                    link.active
+                                        ? 'bg-indigo-600 text-white'
+                                        : 'bg-gray-100 hover:bg-gray-200 dark:bg-dark-chat-800 dark:hover:bg-dark-chat-700 text-gray-700 dark:text-dark-chat-200',
+                                ]"
+                            >
+                                {{ translatePaginationLabel(link.label) }}
+                            </a>
+                            <span
+                                v-else
+                                class="px-3 py-2 text-sm text-gray-400 dark:text-dark-chat-500"
+                            >
+                                {{ translatePaginationLabel(link.label) }}
+                            </span>
+                        </template>
+                    </div>
+                </nav>
+            </div>
         </div>
 
         <!-- Modal -->

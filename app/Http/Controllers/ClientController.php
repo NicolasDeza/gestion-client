@@ -15,7 +15,7 @@ class ClientController extends Controller
     {
         $clients = Client::withCount(['machines', 'interventions'])
             ->orderBy('nom')
-            ->get();
+            ->paginate(15);
 
         return Inertia::render('Clients/Index', [
             'clients' => $clients,
