@@ -14,19 +14,18 @@ class InterventionController extends Controller
 {
 
     public function index() {
-        $interventions = Intervention::with(['machine.client', 'machine.marque', 'machine.machineType'])
+        $interventions = Intervention::with(['machine.client', 'machine.marque', 'machine.machine_type']) // ← machine_type
             ->latest()
-            ->take(15)
-            ->get();
+            ->paginate(15);  // ← Remplacer take(15)->get() par paginate(15)
 
-            return inertia('Interventions/Index', [
-                'interventions' => $interventions
-            ]);
+        return inertia('Interventions/Index', [
+            'interventions' => $interventions
+        ]);
     }
 
     public function show(Intervention $intervention)
 {
-    $intervention->load(['machine.client', 'machine.marque', 'machine.machineType', 'piecesChangees']);
+    $intervention->load(['machine.client', 'machine.marque', 'machine.machine_type', 'piecesChangees']); // ← machine_type
 
     return inertia('Interventions/Show', [
         'intervention' => $intervention,
@@ -116,5 +115,38 @@ class InterventionController extends Controller
 
         return redirect()->back();
     }
+
+    public function storeForClient(Request $request, Client $client)
+{
+    $validated = $request->validate([
+        'machine_marque' => 'required|string|max:255',
+        'machine_type' => 'required|string|max:255',
+        'machine_modele' => 'nullable|string|max:255',
+        'machine_numero_serie' => 'nullable|string|max:255',
+        'date_intervention' => 'required|date',
+        'description' => 'nullable|string',
+        'statut' => 'required|string',
+        'montant' => 'nullable|numeric',
+    ]);
+
+    // Créer la machine associée
+    $machine = $client->machines()->create([
+        'marque_id' => Marque::firstOrCreate(['nom' => $validated['machine_marque']])->id,
+        'machine_type_id' => MachineType::firstOrCreate(['nom' => $validated['machine_type']])->id,
+        'modele' => $validated['machine_modele'] ?? null,
+        'numero_serie' => $validated['machine_numero_serie'] ?? null,
+    ]);
+
+    // Créer l’intervention
+    $machine->interventions()->create([
+        'date_intervention' => $validated['date_intervention'],
+        'description' => $validated['description'] ?? null,
+        'statut' => $validated['statut'],
+        'montant' => $validated['montant'] ?? null,
+        'statut_paiement' => 'non payé',
+    ]);
+
+    return back()->with('success', 'Intervention ajoutée avec succès');
+}
 }
 

@@ -227,7 +227,6 @@ const close = () => {
                             >
                                 <option value="En cours">En cours</option>
                                 <option value="Terminé">Terminé</option>
-                                <option value="Annulé">Annulé</option>
                             </select>
                         </div>
                         <div>

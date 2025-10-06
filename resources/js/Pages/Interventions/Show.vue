@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import { router } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import AddPieceModal from "@/Components/AddPieceModal.vue";
+import ConfirmDeleteModal from "@/Components/ConfirmDeleteModal.vue";
 import DataTable from "@/Components/ui/data-table/DataTable.vue";
 
 const props = defineProps({
@@ -10,6 +11,8 @@ const props = defineProps({
 });
 
 const showModal = ref(false);
+const showDeleteModal = ref(false);
+const pieceToDelete = ref(null);
 
 // --- Ouvrir / fermer le modal d'ajout de pièce
 const openModal = () => (showModal.value = true);
@@ -17,11 +20,25 @@ const closeModal = () => (showModal.value = false);
 
 // --- Supprimer une pièce
 const deletePiece = (id) => {
-    if (confirm("Supprimer cette pièce ?")) {
-        router.delete(route("pieces.destroy", id), {
+    pieceToDelete.value = id;
+    showDeleteModal.value = true;
+};
+
+const confirmDelete = () => {
+    if (pieceToDelete.value) {
+        router.delete(route("pieces.destroy", pieceToDelete.value), {
             preserveScroll: true,
+            onSuccess: () => {
+                showDeleteModal.value = false;
+                pieceToDelete.value = null;
+            },
         });
     }
+};
+
+const cancelDelete = () => {
+    showDeleteModal.value = false;
+    pieceToDelete.value = null;
 };
 
 // --- Basculer le statut de paiement
@@ -77,12 +94,12 @@ const onPieceAdded = () => {
 <template>
     <AppLayout :title="`Intervention #${props.intervention.id}`">
         <div class="max-w-5xl mx-auto py-8 space-y-8">
-            <!-- En-tête -->
+            <!-- En-tête simplifié -->
             <div class="flex justify-between items-center">
                 <h2
                     class="text-2xl font-bold text-gray-800 dark:text-dark-chat-100"
                 >
-                    Détails de l’intervention
+                    Détails de l'intervention #{{ props.intervention.id }}
                 </h2>
 
                 <button
@@ -171,12 +188,44 @@ const onPieceAdded = () => {
                 </template>
             </DataTable>
 
+            <!-- Bouton retour en bas -->
+            <div class="flex justify-center pt-6">
+                <a
+                    :href="route('interventions.index')"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 dark:text-dark-chat-300 hover:text-gray-800 dark:hover:text-dark-chat-100 bg-gray-100 hover:bg-gray-200 dark:bg-dark-chat-800 dark:hover:bg-dark-chat-700 rounded-md border border-gray-300 dark:border-dark-chat-600 transition"
+                >
+                    <svg
+                        class="w-4 h-4 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 19l-7-7 7-7"
+                        ></path>
+                    </svg>
+                    Retour aux interventions
+                </a>
+            </div>
+
             <!-- Modal d'ajout -->
             <AddPieceModal
                 v-if="showModal"
                 @close="closeModal"
                 @piece-added="onPieceAdded"
                 :intervention-id="props.intervention.id"
+            />
+
+            <!-- Modal de confirmation de suppression -->
+            <ConfirmDeleteModal
+                v-if="showDeleteModal"
+                title="Supprimer cette pièce"
+                message="Cette action est irréversible. Êtes-vous sûr de vouloir supprimer cette pièce ?"
+                @confirm="confirmDelete"
+                @cancel="cancelDelete"
             />
         </div>
     </AppLayout>

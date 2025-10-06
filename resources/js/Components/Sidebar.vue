@@ -72,7 +72,7 @@ const toggleDarkMode = () => {
                 >
                     Clients
                 </Link>
-                <Link
+                <!-- <Link
                     :href="route('machines.index')"
                     :class="[
                         route().current('machines.*')
@@ -81,7 +81,7 @@ const toggleDarkMode = () => {
                     ]"
                 >
                     Machines
-                </Link>
+                </Link> -->
                 <Link
                     :href="route('interventions.index')"
                     :class="[

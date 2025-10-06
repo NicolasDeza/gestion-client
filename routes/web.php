@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InterventionController;
 use App\Http\Controllers\PieceChangeeController;
+use App\Http\Controllers\ClientController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -37,6 +38,11 @@ Route::middleware([
 
 // Clients
 Route::resource('clients', ClientController::class);
+Route::get('/clients/{client}/intervention/create', [ClientController::class, 'createIntervention'])
+    ->name('clients.intervention.create');
+Route::post('/clients/{client}/interventions', [InterventionController::class, 'storeForClient'])
+    ->name('interventions.storeForClient');
+
 
 // Machines
 Route::resource('machines', MachineController::class);

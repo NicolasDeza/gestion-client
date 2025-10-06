@@ -34,8 +34,8 @@ const data = computed(() =>
         machine_info: `${intervention.machine?.marque?.nom || ""} ${intervention.machine?.machine_type?.nom || ""}`,
         date_intervention: intervention.date_intervention,
         montant: intervention.montant ? `${intervention.montant}€` : "—",
-        paiement:
-            intervention.statut_paiement === "payé" ? "✅ Payé" : "❌ Non payé",
+        paiement: intervention.statut_paiement || "non payé",
+        paiement_raw: intervention.statut_paiement || "non payé",
     })),
 );
 
@@ -87,8 +87,21 @@ const onInterventionCreated = () => {
                 </button>
             </div>
 
-            <!-- Table simplifiée -->
-            <DataTable :columns="columns" :data="data" />
+            <!-- Table des interventions -->
+            <DataTable :columns="columns" :data="data">
+                <template #paiement="{ row }">
+                    <span
+                        :class="[
+                            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                            row.paiement_raw === 'payé'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                        ]"
+                    >
+                        {{ row.paiement_raw === "payé" ? "Payé" : "Non payé" }}
+                    </span>
+                </template>
+            </DataTable>
 
             <p
                 v-if="interventions.length === 0"

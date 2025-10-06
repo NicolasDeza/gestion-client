@@ -28,15 +28,15 @@ class Machine extends Model
         return $this->belongsTo(Marque::class);
     }
 
-    public function machineType()
+    public function machine_type()
     {
         return $this->belongsTo(MachineType::class, 'machine_type_id');
     }
 
-    // Alias pour la compatibilité
-    public function type()
+    // Si vous avez aussi machineType, gardez les deux pour compatibilité
+    public function machineType()
     {
-        return $this->machineType();
+        return $this->belongsTo(MachineType::class, 'machine_type_id');
     }
 
     public function interventions()

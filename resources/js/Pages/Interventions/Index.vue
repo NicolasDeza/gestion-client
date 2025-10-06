@@ -17,9 +17,10 @@ const columns = [
     { accessorKey: "actions", header: "Actions" },
 ];
 
-// Transformer les données
-const data = computed(() =>
-    props.interventions.map((intervention) => ({
+// Transformer les données - gérer pagination ou array simple
+const data = computed(() => {
+    const interventionsArray = props.interventions.data || props.interventions;
+    return interventionsArray.map((intervention) => ({
         id: intervention.id,
         client_name: intervention.machine?.client?.nom || "N/A",
         machine_info: `${intervention.machine?.marque?.nom || ""} ${intervention.machine?.machine_type?.nom || ""}`,
@@ -27,8 +28,15 @@ const data = computed(() =>
         montant: intervention.montant ? `${intervention.montant}€` : "N/A",
         paiement: intervention.statut_paiement || "non payé",
         actions: intervention,
-    })),
-);
+    }));
+});
+
+// Fonction pour traduire les labels de pagination
+const translatePaginationLabel = (label) => {
+    if (label.includes("Previous")) return "Précédent";
+    if (label.includes("Next")) return "Suivant";
+    return label;
+};
 </script>
 
 <template>
@@ -71,6 +79,37 @@ const data = computed(() =>
                     </a>
                 </template>
             </DataTable>
+
+            <!-- Pagination seulement si les données sont paginées -->
+            <div class="mt-4" v-if="props.interventions.links">
+                <nav class="flex justify-center">
+                    <div class="flex space-x-1">
+                        <template
+                            v-for="link in props.interventions.links"
+                            :key="link.label"
+                        >
+                            <a
+                                v-if="link.url"
+                                :href="link.url"
+                                :class="[
+                                    'px-3 py-2 text-sm rounded-md transition',
+                                    link.active
+                                        ? 'bg-indigo-600 text-white'
+                                        : 'bg-gray-100 hover:bg-gray-200 dark:bg-dark-chat-800 dark:hover:bg-dark-chat-700 text-gray-700 dark:text-dark-chat-200',
+                                ]"
+                            >
+                                {{ translatePaginationLabel(link.label) }}
+                            </a>
+                            <span
+                                v-else
+                                class="px-3 py-2 text-sm text-gray-400 dark:text-dark-chat-500"
+                            >
+                                {{ translatePaginationLabel(link.label) }}
+                            </span>
+                        </template>
+                    </div>
+                </nav>
+            </div>
         </div>
     </AppLayout>
 </template>

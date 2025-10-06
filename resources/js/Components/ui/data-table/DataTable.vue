@@ -55,6 +55,12 @@ const getCellValue = (row, column) => {
                             </slot>
                         </template>
 
+                        <template v-else-if="column.accessorKey === 'paiement'">
+                            <slot name="paiement" :row="row">
+                                {{ getCellValue(row, column) }}
+                            </slot>
+                        </template>
+
                         <template
                             v-else-if="
                                 column.accessorKey === 'statut_intervention'

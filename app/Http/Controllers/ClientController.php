@@ -4,15 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ClientController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+     public function index()
     {
-        //
+        $clients = Client::withCount(['machines', 'interventions'])
+            ->orderBy('nom')
+            ->get();
+
+        return Inertia::render('Clients/Index', [
+            'clients' => $clients,
+        ]);
     }
 
     /**
@@ -35,9 +42,18 @@ class ClientController extends Controller
      * Display the specified resource.
      */
     public function show(Client $client)
-    {
-        //
-    }
+{
+    $client->load([
+        'machines.marque',
+        'machines.machineType',
+        'machines.interventions' => fn($q) => $q->latest(),
+    ]);
+
+    return inertia('Clients/Show', [
+        'client' => $client,
+    ]);
+}
+
 
     /**
      * Show the form for editing the specified resource.
@@ -62,4 +78,13 @@ class ClientController extends Controller
     {
         //
     }
+
+    public function createIntervention(Client $client)
+{
+    $client->load('machines');
+    return Inertia::render('Clients/InterventionCreate', [
+        'client' => $client,
+    ]);
+}
+
 }
