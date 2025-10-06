@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InterventionController;
+use App\Http\Controllers\PieceChangeeController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -28,6 +29,10 @@ Route::middleware([
 
     // Route pour basculer le statut de paiement
     Route::patch('/interventions/{intervention}/toggle-paiement', [App\Http\Controllers\InterventionController::class, 'togglePaiement'])->name('interventions.toggle-paiement');
+
+    // Routes pour les pièces changées
+    Route::post('/pieces', [PieceChangeeController::class, 'store'])->name('pieces.store');
+    Route::delete('/pieces/{piece}', [PieceChangeeController::class, 'destroy'])->name('pieces.destroy');
 });
 
 // Clients

@@ -28,7 +28,21 @@ class PieceChangeeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'intervention_id' => 'required|exists:interventions,id',
+            'nom_piece' => 'required|string|max:255',
+            'quantite' => 'required|integer|min:1',
+            'prix_unitaire' => 'required|numeric|min:0',
+        ]);
+
+        PieceChangee::create([
+            'intervention_id' => $request->intervention_id,
+            'nom_piece' => $request->nom_piece,
+            'quantite' => $request->quantite,
+            'prix_unitaire' => $request->prix_unitaire,
+        ]);
+
+        return redirect()->back()->with('success', 'Pièce ajoutée avec succès');
     }
 
     /**
@@ -58,8 +72,10 @@ class PieceChangeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(PieceChangee $pieceChangee)
+    public function destroy(PieceChangee $piece)
     {
-        //
+        $piece->delete();
+        
+        return redirect()->back()->with('success', 'Pièce supprimée avec succès');
     }
 }

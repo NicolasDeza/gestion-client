@@ -1,5 +1,6 @@
 <script setup>
 import { reactive } from "vue";
+import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
     interventionId: {
@@ -23,12 +24,25 @@ const close = () => {
 
 // Soumettre
 const submit = () => {
-    // TODO: axios ou router.post vers ta route backend
-    console.log("Ajout de pièce:", form);
-
-    // Reset + emit
-    emit("piece-added", { ...form });
-    close();
+    router.post(
+        route("pieces.store"),
+        {
+            intervention_id: props.interventionId,
+            nom_piece: form.nom_piece,
+            quantite: form.quantite,
+            prix_unitaire: form.prix_unitaire,
+        },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                emit("piece-added", { ...form });
+                close();
+            },
+            onError: (errors) => {
+                console.error("Erreur lors de l'ajout:", errors);
+            },
+        },
+    );
 };
 </script>
 
@@ -40,13 +54,13 @@ const submit = () => {
     >
         <!-- Modal content -->
         <div
-            class="bg-white dark:bg-dark-chat-900 rounded-lg p-6 w-full max-w-sm mx-4 max-h-[90vh] overflow-y-auto"
+            class="bg-white dark:bg-dark-chat-900 rounded-lg p-6 w-96 mx-4 max-h-[90vh] overflow-y-auto"
             @click.stop
         >
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <h3
-                    class="text-lg font-semibold text-gray-800 dark:text-dark-chat-200"
+                    class="text-lg font-semibold text-gray-800 dark:text-dark-chat-100"
                 >
                     Ajouter une pièce
                 </h3>
@@ -71,7 +85,7 @@ const submit = () => {
                         v-model="form.nom_piece"
                         type="text"
                         required
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-200"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-100"
                     />
                 </div>
 
@@ -87,7 +101,7 @@ const submit = () => {
                         type="number"
                         min="1"
                         value="1"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-200"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-100"
                     />
                 </div>
 
@@ -102,13 +116,13 @@ const submit = () => {
                         v-model="form.prix_unitaire"
                         type="number"
                         step="0.01"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-200"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-100"
                     />
                 </div>
 
                 <!-- Boutons -->
                 <div
-                    class="flex justify-end space-x-3 pt-4 border-t dark:border-dark-chat-600"
+                    class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-dark-chat-600"
                 >
                     <button
                         type="button"

@@ -13,47 +13,36 @@ const props = defineProps({
     machinesCount: Number,
 });
 
-// État réactif pour les interventions
+// État réactif'
 const interventions = ref([...props.interventions]);
-
-// State pour le modal
 const showModal = ref(false);
 
-// Définir les colonnes pour la DataTable
+// Colonnes de la DataTable
 const columns = [
     { accessorKey: "client_name", header: "Client" },
     { accessorKey: "machine_info", header: "Machine" },
     { accessorKey: "date_intervention", header: "Date" },
-
     { accessorKey: "montant", header: "Montant" },
-    { accessorKey: "paiement", header: "Paiement" }, // payé / non payé
-    { accessorKey: "actions", header: "Actions" }, // bouton toggle paiement
+    { accessorKey: "paiement", header: "Paiement" },
 ];
 
-// Transformer les données pour la DataTable (computed pour la réactivité)
+// Données transformées
 const data = computed(() =>
     interventions.value.map((intervention) => ({
         id: intervention.id,
         client_name: intervention.machine?.client?.nom || "N/A",
         machine_info: `${intervention.machine?.marque?.nom || ""} ${intervention.machine?.machine_type?.nom || ""}`,
         date_intervention: intervention.date_intervention,
-        paiement: intervention.statut_paiement || "non payé", // état financier
-        montant: intervention.montant ? `${intervention.montant}€` : "N/A",
-        actions: intervention,
+        montant: intervention.montant ? `${intervention.montant}€` : "—",
+        paiement:
+            intervention.statut_paiement === "payé" ? "✅ Payé" : "❌ Non payé",
     })),
 );
 
-// Ouvrir le modal
-const openModal = () => {
-    showModal.value = true;
-};
+// Gestion du modal
+const openModal = () => (showModal.value = true);
+const closeModal = () => (showModal.value = false);
 
-// Fermer le modal
-const closeModal = () => {
-    showModal.value = false;
-};
-
-// Fonction appelée quand une intervention est créée
 const onInterventionCreated = () => {
     router.reload({
         only: ["interventions"],
@@ -62,35 +51,6 @@ const onInterventionCreated = () => {
             interventions.value = [...page.props.interventions];
         },
     });
-};
-
-// Fonction pour changer le statut de paiement
-const togglePaiement = (intervention) => {
-    const nouveauStatut =
-        intervention.statut_paiement === "payé" ? "non payé" : "payé";
-
-    const index = interventions.value.findIndex(
-        (i) => i.id === intervention.id,
-    );
-    if (index !== -1) {
-        interventions.value[index].statut_paiement = nouveauStatut;
-    }
-
-    router.patch(
-        route("interventions.toggle-paiement", intervention.id),
-        { statut_paiement: nouveauStatut },
-        {
-            preserveScroll: true,
-            preserveState: true,
-            onError: (errors) => {
-                if (index !== -1) {
-                    interventions.value[index].statut_paiement =
-                        intervention.statut_paiement;
-                }
-                console.log("Erreur du toggle:", errors);
-            },
-        },
-    );
 };
 </script>
 
@@ -101,18 +61,18 @@ const togglePaiement = (intervention) => {
             <h2
                 class="font-semibold text-xl text-gray-800 dark:text-dark-chat-100 leading-tight"
             >
-                Dashboard
+                Tableau de bord
             </h2>
         </template>
 
-        <!-- Stats Cards -->
+        <!-- Cartes de stats -->
         <StatsCards
             :clients-count="clientsCount"
             :machines-count="machinesCount"
         />
 
-        <!-- Bouton Ajouter + DataTable -->
-        <div class="mt-8">
+        <!-- Dernières interventions -->
+        <div class="mt-8 bg-white dark:bg-dark-chat-900 rounded-xl shadow p-6">
             <div class="flex justify-between items-center mb-4">
                 <h3
                     class="text-lg font-semibold text-gray-800 dark:text-dark-chat-200"
@@ -123,34 +83,22 @@ const togglePaiement = (intervention) => {
                     @click="openModal"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition"
                 >
-                    Ajouter
+                    Nouvelle intervention
                 </button>
             </div>
 
-            <!-- DataTable -->
-            <DataTable :columns="columns" :data="data">
-                <!-- Slot personnalisé pour actions -->
-                <template #actions="{ row }">
-                    <button
-                        @click="togglePaiement(row.actions)"
-                        :class="[
-                            'px-3 py-1 rounded-md text-sm font-medium transition',
-                            row.actions.statut_paiement === 'payé'
-                                ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800'
-                                : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800',
-                        ]"
-                    >
-                        {{
-                            row.actions.statut_paiement === "payé"
-                                ? "Marquer non payé"
-                                : "Marquer payé"
-                        }}
-                    </button>
-                </template>
-            </DataTable>
+            <!-- Table simplifiée -->
+            <DataTable :columns="columns" :data="data" />
+
+            <p
+                v-if="interventions.length === 0"
+                class="text-center text-gray-500 dark:text-gray-400 mt-4"
+            >
+                Aucune intervention enregistrée pour le moment.
+            </p>
         </div>
 
-        <!-- Modal -->
+        <!-- Modal création -->
         <InterventionModal
             v-if="showModal"
             @close="closeModal"
