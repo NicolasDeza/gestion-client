@@ -1,112 +1,198 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-import Checkbox from '@/Components/Checkbox.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import InputError from "@/Components/InputError.vue";
 
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
     terms: false,
 });
 
 const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+    form.post(route("register"), {
+        onFinish: () => form.reset("password", "password_confirmation"),
     });
 };
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Inscription - Samu Horticole" />
 
-    <AuthenticationCard>
-        <template #logo>
-            <AuthenticationCardLogo />
-        </template>
-
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="name" value="Name" />
-                <TextInput
-                    id="name"
-                    v-model="form.name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
-                <InputError class="mt-2" :message="form.errors.name" />
+    <div
+        class="min-h-screen bg-gray-50 dark:bg-dark-chat-900 flex flex-col justify-center items-center py-8"
+    >
+        <!-- Container principal -->
+        <div class="max-w-md w-full mx-auto px-6">
+            <!-- Logo/Titre -->
+            <div class="text-center mb-8">
+                <h1
+                    class="text-3xl font-bold text-gray-900 dark:text-dark-chat-100 mb-2"
+                >
+                    Samu Horticole
+                </h1>
+                <p class="text-gray-600 dark:text-dark-chat-300">
+                    Créez votre compte
+                </p>
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="email" value="Email" />
-                <TextInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="username"
-                />
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-                <TextInput
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
-                <TextInput
-                    id="password_confirmation"
-                    v-model="form.password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password_confirmation" />
-            </div>
-
-            <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="mt-4">
-                <InputLabel for="terms">
-                    <div class="flex items-center">
-                        <Checkbox id="terms" v-model:checked="form.terms" name="terms" required />
-
-                        <div class="ms-2">
-                            I agree to the <a target="_blank" :href="route('terms.show')" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">Terms of Service</a> and <a target="_blank" :href="route('policy.show')" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">Privacy Policy</a>
-                        </div>
+            <!-- Formulaire -->
+            <div class="bg-white dark:bg-dark-chat-800 rounded-lg shadow p-6">
+                <form @submit.prevent="submit" class="space-y-4">
+                    <!-- Nom -->
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-700 dark:text-dark-chat-200 mb-1"
+                        >
+                            Nom complet
+                        </label>
+                        <input
+                            id="name"
+                            v-model="form.name"
+                            type="text"
+                            required
+                            autofocus
+                            autocomplete="name"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-100 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        <InputError class="mt-1" :message="form.errors.name" />
                     </div>
-                    <InputError class="mt-2" :message="form.errors.terms" />
-                </InputLabel>
-            </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                    Already registered?
-                </Link>
+                    <!-- Email -->
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-700 dark:text-dark-chat-200 mb-1"
+                        >
+                            Email
+                        </label>
+                        <input
+                            id="email"
+                            v-model="form.email"
+                            type="email"
+                            required
+                            autocomplete="username"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-100 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        <InputError class="mt-1" :message="form.errors.email" />
+                    </div>
 
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Register
-                </PrimaryButton>
+                    <!-- Mot de passe -->
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-700 dark:text-dark-chat-200 mb-1"
+                        >
+                            Mot de passe
+                        </label>
+                        <input
+                            id="password"
+                            v-model="form.password"
+                            type="password"
+                            required
+                            autocomplete="new-password"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-100 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        <InputError
+                            class="mt-1"
+                            :message="form.errors.password"
+                        />
+                    </div>
+
+                    <!-- Confirmation mot de passe -->
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-700 dark:text-dark-chat-200 mb-1"
+                        >
+                            Confirmer le mot de passe
+                        </label>
+                        <input
+                            id="password_confirmation"
+                            v-model="form.password_confirmation"
+                            type="password"
+                            required
+                            autocomplete="new-password"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-chat-600 rounded-md bg-white dark:bg-dark-chat-800 text-gray-900 dark:text-dark-chat-100 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        <InputError
+                            class="mt-1"
+                            :message="form.errors.password_confirmation"
+                        />
+                    </div>
+
+                    <!-- Conditions -->
+                    <div
+                        v-if="
+                            $page.props.jetstream
+                                .hasTermsAndPrivacyPolicyFeature
+                        "
+                        class="flex items-start"
+                    >
+                        <input
+                            id="terms"
+                            v-model="form.terms"
+                            type="checkbox"
+                            required
+                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-1"
+                        />
+                        <label
+                            for="terms"
+                            class="ml-2 text-sm text-gray-600 dark:text-dark-chat-300"
+                        >
+                            J'accepte les
+                            <a
+                                target="_blank"
+                                :href="route('terms.show')"
+                                class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 underline"
+                            >
+                                conditions d'utilisation
+                            </a>
+                            et la
+                            <a
+                                target="_blank"
+                                :href="route('policy.show')"
+                                class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 underline"
+                            >
+                                politique de confidentialité
+                            </a>
+                        </label>
+                        <InputError class="mt-1" :message="form.errors.terms" />
+                    </div>
+
+                    <!-- Bouton inscription -->
+                    <button
+                        type="submit"
+                        :disabled="form.processing"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 disabled:opacity-50"
+                    >
+                        S'inscrire
+                    </button>
+                </form>
+
+                <!-- Lien vers connexion -->
+                <div
+                    class="mt-6 text-center border-t border-gray-200 dark:border-dark-chat-600 pt-4"
+                >
+                    <p class="text-sm text-gray-600 dark:text-dark-chat-300">
+                        Déjà un compte ?
+                        <Link
+                            :href="route('login')"
+                            class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 font-medium"
+                        >
+                            Se connecter
+                        </Link>
+                    </p>
+                </div>
             </div>
-        </form>
-    </AuthenticationCard>
+        </div>
+
+        <!-- Retour accueil -->
+        <div class="mt-6">
+            <a
+                href="/"
+                class="text-sm text-gray-500 dark:text-dark-chat-400 hover:text-gray-700 dark:hover:text-dark-chat-200"
+            >
+                ← Retour à l'accueil
+            </a>
+        </div>
+    </div>
 </template>
