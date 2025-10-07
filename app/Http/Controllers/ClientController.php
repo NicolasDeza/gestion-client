@@ -13,13 +13,17 @@ class ClientController extends Controller
      */
      public function index()
     {
-        $clients = Client::withCount(['machines', 'interventions'])
-            ->orderBy('nom')
-            ->paginate(15);
+        $clients = Client::with([
+        'machines.marque',
+        'machines.machine_type',
+    ])
+    ->withCount(['machines', 'interventions'])
+    ->orderBy('nom')
+    ->get();
 
-        return Inertia::render('Clients/Index', [
-            'clients' => $clients,
-        ]);
+return Inertia::render('Clients/Index', [
+    'clients' => $clients,
+]);
     }
 
     /**

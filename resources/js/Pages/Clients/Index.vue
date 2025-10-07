@@ -40,7 +40,7 @@ const onInterventionCreated = () => {
         preserveScroll: true,
         onSuccess: () => {
             showModal.value = false;
-            toastMessage.value = "✅ Intervention ajoutée avec succès !";
+            toastMessage.value = "Intervention ajoutée avec succès !";
         },
     });
 };

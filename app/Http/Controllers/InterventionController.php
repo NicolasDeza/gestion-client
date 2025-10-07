@@ -116,37 +116,49 @@ class InterventionController extends Controller
         return redirect()->back();
     }
 
-    public function storeForClient(Request $request, Client $client)
+   public function storeForClient(Request $request, Client $client)
 {
+    // Validation basique
     $validated = $request->validate([
-        'machine_marque' => 'required|string|max:255',
-        'machine_type' => 'required|string|max:255',
+        'existing_machine_id' => 'nullable|exists:machines,id',
+        'machine_marque' => 'nullable|string|max:255',
+        'machine_type' => 'nullable|string|max:255',
         'machine_modele' => 'nullable|string|max:255',
         'machine_numero_serie' => 'nullable|string|max:255',
         'date_intervention' => 'required|date',
         'description' => 'nullable|string',
-        'statut' => 'required|string',
         'montant' => 'nullable|numeric',
+        'statut' => 'required|string|in:En cours,Terminé',
     ]);
 
-    // Créer la machine associée
-    $machine = $client->machines()->create([
-        'marque_id' => Marque::firstOrCreate(['nom' => $validated['machine_marque']])->id,
-        'machine_type_id' => MachineType::firstOrCreate(['nom' => $validated['machine_type']])->id,
-        'modele' => $validated['machine_modele'] ?? null,
-        'numero_serie' => $validated['machine_numero_serie'] ?? null,
-    ]);
+    // 1️ Déterminer la machine utilisée
+    if ($request->filled('existing_machine_id')) {
+        // Machine existante → on la récupère
+        $machine = Machine::findOrFail($request->existing_machine_id);
+    } else {
+        // Nouvelle machine → on la crée
+        $machine = Machine::create([
+            'client_id' => $client->id,
+            'marque_id' => Marque::firstOrCreate(['nom' => $request->machine_marque])->id,
+            'machine_type_id' => MachineType::firstOrCreate(['nom' => $request->machine_type])->id,
+            'modele' => $request->machine_modele,
+            'numero_serie' => $request->machine_numero_serie,
+        ]);
+    }
 
-    // Créer l’intervention
-    $machine->interventions()->create([
-        'date_intervention' => $validated['date_intervention'],
-        'description' => $validated['description'] ?? null,
-        'statut' => $validated['statut'],
-        'montant' => $validated['montant'] ?? null,
+    // 2️ Créer l’intervention
+    $intervention = Intervention::create([
+        'machine_id' => $machine->id,
+        'date_intervention' => $request->date_intervention,
+        'description' => $request->description,
+        'montant' => $request->montant,
+        'statut' => $request->statut,
         'statut_paiement' => 'non payé',
     ]);
 
+    // 3️ Redirection ou réponse Inertia
     return back()->with('success', 'Intervention ajoutée avec succès');
 }
+
 }
 

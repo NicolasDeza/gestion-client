@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -11,9 +11,11 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "intervention-created"]);
 
+const selectedMachineId = ref(""); // ID d'une machine existante choisie
+
 // --- Formulaire
 const form = ref({
-    // Machine
+    // Machine (si nouvelle)
     machine_marque: "",
     machine_type: "",
     machine_modele: "",
@@ -26,11 +28,20 @@ const form = ref({
     montant: "",
 });
 
+// Si une machine existante est sélectionnée → on grise les champs
+const isExistingMachine = ref(false);
+watch(selectedMachineId, (value) => {
+    isExistingMachine.value = !!value;
+});
+
 // --- Soumission
 const submit = () => {
     router.post(
         route("interventions.storeForClient", props.client.id),
-        form.value,
+        {
+            ...form.value,
+            existing_machine_id: selectedMachineId.value || null,
+        },
         {
             preserveScroll: true,
             onSuccess: () => {
@@ -74,33 +85,67 @@ const close = () => emit("close");
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- Section Machine -->
                 <div class="border-b dark:border-dark-chat-600 pb-4">
-                    <h4 class="text-md font-medium mb-3">Nouvelle machine</h4>
+                    <h4
+                        class="text-md font-medium mb-3 text-gray-800 dark:text-dark-chat-200"
+                    >
+                        Sélection de la machine
+                    </h4>
+
+                    <!-- Sélecteur de machine existante -->
+                    <div class="mb-4">
+                        <label
+                            class="block text-sm font-medium mb-1 text-gray-700 dark:text-dark-chat-300"
+                        >
+                            Machine existante
+                        </label>
+                        <select
+                            v-model="selectedMachineId"
+                            class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600 text-gray-900 dark:text-dark-chat-200"
+                        >
+                            <option value="">Créer une nouvelle machine</option>
+                            <option
+                                v-for="machine in client.machines"
+                                :key="machine.id"
+                                :value="machine.id"
+                            >
+                                {{ machine.marque.nom }}
+                                {{ machine.machine_type.nom }} ({{
+                                    machine.modele
+                                }})
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Champs machine désactivés si machine existante -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm mb-1">Marque *</label>
                             <input
                                 v-model="form.machine_marque"
+                                :disabled="isExistingMachine"
                                 required
                                 type="text"
-                                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600"
+                                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600 disabled:opacity-50"
                             />
                         </div>
                         <div>
                             <label class="block text-sm mb-1">Type *</label>
                             <input
                                 v-model="form.machine_type"
+                                :disabled="isExistingMachine"
                                 required
                                 type="text"
                                 placeholder="Tondeuse, Tracteur..."
-                                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600"
+                                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600 disabled:opacity-50"
                             />
                         </div>
                         <div>
                             <label class="block text-sm mb-1">Modèle</label>
                             <input
                                 v-model="form.machine_modele"
+                                :disabled="isExistingMachine"
                                 type="text"
-                                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600"
+                                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600 disabled:opacity-50"
                             />
                         </div>
                         <div>
@@ -109,8 +154,9 @@ const close = () => emit("close");
                             >
                             <input
                                 v-model="form.machine_numero_serie"
+                                :disabled="isExistingMachine"
                                 type="text"
-                                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600"
+                                class="w-full px-3 py-2 border rounded-md bg-white dark:bg-dark-chat-800 border-gray-300 dark:border-dark-chat-600 disabled:opacity-50"
                             />
                         </div>
                     </div>
@@ -118,7 +164,9 @@ const close = () => emit("close");
 
                 <!-- Section Intervention -->
                 <div>
-                    <h4 class="text-md font-medium mb-3">
+                    <h4
+                        class="text-md font-medium mb-3 text-gray-800 dark:text-dark-chat-200"
+                    >
                         Détails de l’intervention
                     </h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
