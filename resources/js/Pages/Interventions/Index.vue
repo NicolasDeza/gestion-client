@@ -33,8 +33,18 @@ const data = computed(() => {
 
 // Fonction pour traduire les labels de pagination
 const translatePaginationLabel = (label) => {
-    if (label.includes("Previous")) return "Précédent";
-    if (label.includes("Next")) return "Suivant";
+    if (
+        label.toLowerCase().includes("previous") ||
+        label.toLowerCase().includes("pagination.previous")
+    )
+        return "Précédent";
+
+    if (
+        label.toLowerCase().includes("next") ||
+        label.toLowerCase().includes("pagination.next")
+    )
+        return "Suivant";
+
     return label;
 };
 </script>
